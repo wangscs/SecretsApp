@@ -1,9 +1,12 @@
-require("dotenv").config();
+// require("dotenv").config();
 const express = require("express");
 const ejs = require("ejs");
 const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
-var encrypt = require('mongoose-encryption');
+// const encrypt = require('mongoose-encryption');
+// const md5 = require("md5");
+const bcrypt = require('bcrypt');
+const saltRounds = 10;
 
 const app = express();
 
@@ -20,7 +23,8 @@ const userSchema = new mongoose.Schema({
   password: String,
 });
 
-userSchema.plugin(encrypt, {secret: process.env.secret, encryptedFields: ["password"]});
+// Plugin is used for encryption
+// userSchema.plugin(encrypt, {secret: process.env.secret, encryptedFields: ["password"]});
 
 const User = new mongoose.model("User", userSchema);
 
@@ -37,6 +41,7 @@ app.get("/register", function(req, res){
 });
 
 app.post("/login", function(req, res){
+
   const username = req.body.username;
   const password = req.body.password;
 
@@ -45,29 +50,40 @@ app.post("/login", function(req, res){
       console.log(err);
     } else {
       if(foundUser){
-        if(foundUser.password === password){
-          res.render("secrets");
-        }
+        bcrypt.compare(password, foundUser.password, function(err, result){
+          if(result === true){
+            res.render("secrets");
+          }
+        });
       } else {
         res.send("User not found");
       }
     }
-  })
+  });
 });
 
 app.post("/register", function(req, res){
 
-  const newUser = new User({
-    email: req.body.username,
-    password: req.body.password,
-  });
+  // This is the call for calling salting and hashing on separate calls
+  // bcrypt.genSalt(saltRounds, function(err, salt){
+  //   bcrypt.hash(password, salt, function(err, hash){
+  //     //Store hash in password DB
+  //   });
+  // });
 
-  newUser.save(function(err){
-    if(err){
-      console.log(err);
-    } else {
-      res.render("secrets");
-    }
+  bcrypt.hash(req.body.password, saltRounds, function(err, hash){
+    //Store hash in password DB
+    const newUser = new User({
+      email: req.body.username,
+      password: hash,
+    });
+    newUser.save(function(err){
+      if(err){
+        console.log(err);
+      } else {
+        res.render("secrets");
+      }
+    });
   });
 });
 

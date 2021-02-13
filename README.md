@@ -17,10 +17,28 @@ My reason to make this is purely to practice user authentication and the differe
 - Encryption isnt good enough when my code base is store on an open source platform like github
 
 ### Level 3 Hashing
+- Benefits by not requiring the need to turn an encrypted password back to plain text
+- Uses mathematical equations to make it almost impossible to backtrack or reverse encryptions back to plain text
+- When user registers, password is hashed on stored on db, when logging in users entered password will be hashed and compared to the hashed string in db
+- Cons: People use hash tables for most common passwords, brute force may be able to hack into system.
 
+### Level 4 Salting with Hashing
+- Generates a random unique string of characters and appends it to the users password during registration
+- When logging in, itll retrieve the password entered and combine it with the salt store in the user's profile and hash that
+- If the entered password + salt + hash = db.user.password, then it grants access
+- This increases the security from hashing 
+- To further increase security, use different hashing algorithms from MD5 to bcrypt
+- To even further increase security, use many rounds of salting.
 
-### Level 4
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; - For example, user enters password.
 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; - Users password gets appended with a salt code
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; - Users password with salt code gets hashed using bcrypt
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; - Hashed password gets appended with another salt code and hashed again 
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; - The second hashed password is now different from the first
 
 ### Level 5
 
