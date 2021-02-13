@@ -16,7 +16,7 @@ My reason to make this is purely to practice user authentication and the differe
 - Method used: AES-256-CBC encryption
 - Encryption isnt good enough when my code base is store on an open source platform like github
 
-### Level 3
+### Level 3 Hashing
 
 
 ### Level 4
