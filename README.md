@@ -46,7 +46,11 @@ My reason to make this is purely to practice user authentication and the differe
 - It also remembers stateful information for the stateless HTTP protocols.
 - When using passport-local-mongoose, it'll automatically salt and hash our passwords for us.
 
-### Level 6
+### Level 6 OAuth (Delegation)
+- An open standard for access delegation, which is commonly used as a way for users to grant websites or applications to access their information without giving the websites their passwords.
+- Gives the responsibility of user security to big tech companies with many intelligent engineers like google/facebook to authenticate users so third party websites would have less liability in the event of being hacked.
+- IE, registering an account with spotify using facebook login credentials.
+- Another example would be if a user is trying to make an account with a third party website, they can register using their facebook. So the website will send a get request to facebook which would respond with the users name, email, credentials, etc.
 
 
 

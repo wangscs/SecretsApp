@@ -10,6 +10,7 @@ const mongoose = require("mongoose");
 const session = require("express-session");
 const passport = require("passport");
 const passportLocalMongoose = require("passport-local-mongoose");
+const GoogleStrategy = require('passport-google-oauth20').Strategy;
 
 const app = express();
 
@@ -48,6 +49,7 @@ passport.use(User.createStrategy());
 passport.serializeUser(User.serializeUser);
 passport.deserializeUser(User.deserializeUser);
 
+// ******************************GET REQUESTS**********************************
 app.get("/", function(req, res){
   res.render("home");
 });
@@ -61,7 +63,11 @@ app.get("/register", function(req, res){
 });
 
 app.get("/secrets", function(req, res){
+
+  console.log("inside the get method for secrets");
+
   if(req.isAuthenticated()){
+    console.log("About to be redirected to secrets");
     res.render("secrets");
   } else {
     res.redirect("/login");
@@ -73,9 +79,10 @@ app.get("/logout", function(req, res){
   res.redirect("/");
 });
 
+// **********************************POST REQUESTS*****************************
 app.post("/login", function(req, res){
   
-  // *****************Bcrypt login Method**************************************
+  // *****************Bcrypt login Method******************
   // const username = req.body.username;
   // const password = req.body.password;
   // User.findOne({email: username}, function(err, foundUser){
@@ -93,7 +100,7 @@ app.post("/login", function(req, res){
   //     }
   //   }
   // });
-  // **************************************************************************
+  // ******************************************************
 
   const user = new User({
     username: req.body.username,
@@ -119,7 +126,7 @@ app.post("/login", function(req, res){
 
 app.post("/register", function(req, res){
 
-  // *****************Bcrypt Register Method***********************************
+  // *****************Bcrypt Register Method***************
   // bcrypt.hash(req.body.password, saltRounds, function(err, hash){
   //   //Store hash in password DB
   //   const newUser = new User({
@@ -134,26 +141,39 @@ app.post("/register", function(req, res){
   //     }
   //   });
   // });
-  // **************************************************************************
+  // ******************************************************
+
+  console.log("Inside Post register route");
 
   User.register({username: req.body.username}, req.body.password, function(err, user){
+
+    console.log("Inside user.register heres username" + req.body.username);
+    console.log("Heres req.body.password= "+ req.body.password);
+    console.log(user);
     if(err){
       console.log(err);
       res.redirect("/register");
     } else {
-      passport.authenticate("local")(req, res, function(){
+
+      console.log("Before passport auth");
+
+      passport.authenticate('local', {failureRedirect: '/'}),
+      function(req, res){
+
+        console.log("Inside passport.auth*************");
+
         res.redirect("/secrets");
-      })
+
+        console.log("After redirection**************");
+      }(req, res, next);
     }
+
+    console.log("After ifelse statement");
+    // res.redirect("/register");
   });
+
+  console.log("bruh user.register never got called");
 });
-
-
-
-
-
-
-
 
 
 
