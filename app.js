@@ -66,7 +66,12 @@ app.get("/secrets", function(req, res){
   } else {
     res.redirect("/login");
   }
-})
+});
+
+app.get("/logout", function(req, res){
+  req.logout();
+  res.redirect("/");
+});
 
 app.post("/login", function(req, res){
   
