@@ -44,6 +44,7 @@ My reason to make this is purely to practice user authentication and the differe
 - Cookies are a small piece of data that a server sends to the user's browser so that the browser can store it and send back data when the user comes back later to the same server.
 - It can be used to tell if two requests came from the same browser and keep the user logged in.
 - It also remembers stateful information for the stateless HTTP protocols.
+- When using passport-local-mongoose, it'll automatically salt and hash our passwords for us.
 
 ### Level 6
 

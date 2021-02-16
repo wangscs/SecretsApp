@@ -7,9 +7,9 @@ const mongoose = require("mongoose");
 // const md5 = require("md5");
 // const bcrypt = require('bcrypt');
 // const saltRounds = 10;
-const session = require('express-session');
-const passport = require('passport');
-const passportLocalMongoose = require('passport-local-mongoose')
+const session = require("express-session");
+const passport = require("passport");
+const passportLocalMongoose = require("passport-local-mongoose");
 
 const app = express();
 
@@ -60,6 +60,14 @@ app.get("/register", function(req, res){
   res.render("register");
 });
 
+app.get("/secrets", function(req, res){
+  if(req.isAuthenticated()){
+    res.render("secrets");
+  } else {
+    res.redirect("/login");
+  }
+})
+
 app.post("/login", function(req, res){
   
   // *****************Bcrypt login Method**************************************
@@ -82,6 +90,26 @@ app.post("/login", function(req, res){
   // });
   // **************************************************************************
 
+  const user = new User({
+    username: req.body.username,
+    password: req.body.password
+  });
+
+  console.log(req.body.username);
+  console.log(req.body.password);
+
+  req.login(user, function(err){
+    console.log("hi");
+    if(err){
+      console.log(err);
+    } else {
+      console.log("hey im in");
+      passport.authenticate("local")(req, res, function(){
+        console.log("already authed");
+        res.redirect("/secrets");
+      });
+    }
+  });
 });
 
 app.post("/register", function(req, res){
@@ -102,6 +130,17 @@ app.post("/register", function(req, res){
   //   });
   // });
   // **************************************************************************
+
+  User.register({username: req.body.username}, req.body.password, function(err, user){
+    if(err){
+      console.log(err);
+      res.redirect("/register");
+    } else {
+      passport.authenticate("local")(req, res, function(){
+        res.redirect("/secrets");
+      })
+    }
+  });
 });
 
 
