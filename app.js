@@ -8,11 +8,11 @@ const mongoose = require("mongoose");
 // const md5 = require("md5");
 // const bcrypt = require('bcrypt');
 // const saltRounds = 10;
-const session = require("express-session");
+const session = require('express-session');
 const passport = require("passport");
 const passportLocalMongoose = require("passport-local-mongoose");
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
-const findOrCreate = require("mongoose-findorcreate");
+const findOrCreate = require('mongoose-findorcreate');
 
 const app = express();
 
@@ -23,7 +23,7 @@ app.use(bodyParser.urlencoded({
 }));
 
 app.use(session({
-  secret: "The secretest secret.",
+  secret: "The secret.",
   resave: false,
   saveUninitialized: false,
 }));
@@ -38,6 +38,7 @@ const userSchema = new mongoose.Schema({
   email: String,
   password: String,
   googleId: String,
+  secret: String
 });
 
 // Plugin for sessions
@@ -49,9 +50,11 @@ userSchema.plugin(findOrCreate);
 const User = new mongoose.model("User", userSchema);
 
 passport.use(User.createStrategy());
+
 passport.serializeUser(function(user, done){
   done(null, user.id);
 });
+
 passport.deserializeUser(function(id, done){
   User.findById(id, function(err, user){
     done(err, user);
@@ -61,14 +64,14 @@ passport.deserializeUser(function(id, done){
 passport.use(new GoogleStrategy({
   clientID: process.env.CLIENT_ID,
   clientSecret: process.env.CLIENT_SECRET,
-  callbackURL: "http://localhost:3000/auth/google/secret",
-  userProfile: "https://www.googleapis.com/oauth2/v3/userinfo"
-},
-function(accessToken, refreshToken, profile, done) {
-  User.findOrCreate({ googleId: profile.id }, function (err, user) {
-    return done(err, user);
-  });
-}
+  callbackURL: "http://localhost:3000/auth/google/secrets",
+  userProfileURL: "https://www.googleapis.com/oauth2/v3/userinfo"
+  },
+  function(accessToken, refreshToken, profile, done) {
+    User.findOrCreate({ googleId: profile.id }, function (err, user) {
+      return done(err, user);
+    });
+  }
 ));
 
 // ******************************GET REQUESTS**********************************
@@ -77,13 +80,13 @@ app.get("/", function(req, res){
 });
 
 app.get("/auth/google", 
-  passport.authenticate("google", { scope: ["profile"] })
+  passport.authenticate('google', { scope: ["profile"] })
 );
 
-app.get("/auth/google/secret", 
-  passport.authenticate('google', { failureRedirect: '/login' }),
+app.get("/auth/google/secrets", 
+  passport.authenticate('google', { failureRedirect: "/login" }),
   function(req, res) {
-    res.redirect('/secrets');
+    res.redirect("/secrets");
   });
 
 app.get("/login", function(req, res){
@@ -95,15 +98,40 @@ app.get("/register", function(req, res){
 });
 
 app.get("/secrets", function(req, res){
+  User.find({"secret": {$ne: null}}, function(err, foundUsers){
+    if(err){
+      console.log(err);
+    } else {
+      if(foundUsers){
+        res.render("secrets", {usersWithSecrets: foundUsers});
+      }
+    }
+  });
+});
 
-  console.log("inside the get method for secrets");
-
+app.get("/submit", function(req, res){
   if(req.isAuthenticated()){
-    console.log("About to be redirected to secrets");
-    res.render("secrets");
+    res.render("submit");
   } else {
-    res.redirect("/login");
+    res.render("/login");
   }
+});
+
+app.post("/submit", function(req, res){
+  const submittedSecret = req.body.secret;
+
+  User.findById(req.user.id, function(err, foundUser){
+    if(err){
+      console.log(err);
+    } else {
+      if(foundUser){
+        foundUser.secret = submittedSecret;
+        foundUser.save(function(){
+          res.redirect("/secrets");
+        });
+      }
+    }
+  });
 });
 
 app.get("/logout", function(req, res){
@@ -111,7 +139,6 @@ app.get("/logout", function(req, res){
   res.redirect("/");
 });
 
-// **********************************POST REQUESTS*****************************
 app.post("/login", function(req, res){
   
   // *****************Bcrypt login Method******************
@@ -139,17 +166,11 @@ app.post("/login", function(req, res){
     password: req.body.password
   });
 
-  console.log(req.body.username);
-  console.log(req.body.password);
-
   req.login(user, function(err){
-    console.log("hi");
     if(err){
       console.log(err);
     } else {
-      console.log("hey im in");
       passport.authenticate("local")(req, res, function(){
-        console.log("already authed");
         res.redirect("/secrets");
       });
     }
@@ -175,36 +196,16 @@ app.post("/register", function(req, res){
   // });
   // ******************************************************
 
-  console.log("Inside Post register route");
-
   User.register({username: req.body.username}, req.body.password, function(err, user){
-
-    console.log("Inside user.register heres username" + req.body.username);
-    console.log("Heres req.body.password= "+ req.body.password);
-    console.log(user);
-
-    if(err){
+    if (err) {
       console.log(err);
       res.redirect("/register");
     } else {
-
-      console.log("Before passport auth");
-
-      passport.authenticate('local')(req, res, function(){
-
-        console.log("Inside passport.auth*************");
-
+      passport.authenticate("local")(req, res, function(){
         res.redirect("/secrets");
-
-        console.log("After redirection**************");
       });
     }
-
-    console.log("After ifelse statement");
-    // res.redirect("/register");
   });
-
-  console.log("bruh user.register never got called");
 });
 
 app.listen(3000, function(){
