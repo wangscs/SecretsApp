@@ -1,3 +1,4 @@
+//jshint esversion:6
 require("dotenv").config();
 const express = require("express");
 const ejs = require("ejs");
@@ -36,6 +37,7 @@ mongoose.set("useCreateIndex", true);
 const userSchema = new mongoose.Schema({
   email: String,
   password: String,
+  googleId: String,
 });
 
 // Plugin for sessions
@@ -180,6 +182,7 @@ app.post("/register", function(req, res){
     console.log("Inside user.register heres username" + req.body.username);
     console.log("Heres req.body.password= "+ req.body.password);
     console.log(user);
+
     if(err){
       console.log(err);
       res.redirect("/register");
@@ -187,15 +190,14 @@ app.post("/register", function(req, res){
 
       console.log("Before passport auth");
 
-      passport.authenticate('local', {failureRedirect: '/'}),
-      function(req, res){
+      passport.authenticate('local')(req, res, function(){
 
         console.log("Inside passport.auth*************");
 
         res.redirect("/secrets");
 
         console.log("After redirection**************");
-      }(req, res, next);
+      });
     }
 
     console.log("After ifelse statement");
@@ -204,8 +206,6 @@ app.post("/register", function(req, res){
 
   console.log("bruh user.register never got called");
 });
-
-
 
 app.listen(3000, function(){
   console.log("Server has started on port 3000.");
