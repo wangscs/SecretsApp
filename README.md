@@ -1,8 +1,7 @@
 # Secrets App
-The purpose of this secrets app is to allow users to anonymously post content for other anonymous users to see. 
-People who are not users (i.e did not create an account) are not allowed to view the secrets/posts.
+The secrets app is a form of anonymous social media that allows users to post and share their secret. People who are not users (i.e did not create an account) are not allowed to view the secrets/posts. As more people post secrets, security and privacy become a concern and the app has to protect the users security. There are many levels of security an application can have in place in order to protect the users against malicious hackers.
 
-My reason to make this is purely to practice user authentication and the different levels of security I am able to give a web app that I create.
+My reason to make this application is to learn and practice user authentication/security and the different levels of security I am able to integrate into the application.
 
 
 # Notes for user Security/Encryption
@@ -52,6 +51,11 @@ My reason to make this is purely to practice user authentication and the differe
 - IE, registering an account with spotify using facebook login credentials.
 - Another example would be if a user is trying to make an account with a third party website, they can register using their facebook. So the website will send a get request to facebook which would respond with the users name, email, credentials, etc.
 
+# Sample images of the app
+ 
+![alt text](https://github.com/wangscs/SecretsApp/blob/master/images/HomePage.PNG "Home Page")
 
+![alt text](https://github.com/wangscs/SecretsApp/blob/master/images/RegisterPage.PNG "Registration Page")
 
+![alt text](https://github.com/wangscs/SecretsApp/blob/master/images/SecretsPage.PNG "Secrets Page")
 
