@@ -98,6 +98,7 @@ app.get("/register", function(req, res){
 });
 
 app.get("/secrets", function(req, res){
+  // Finds all user with existing secrets
   User.find({"secret": {$ne: null}}, function(err, foundUsers){
     if(err){
       console.log(err);
