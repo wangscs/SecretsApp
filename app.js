@@ -64,7 +64,7 @@ passport.deserializeUser(function(id, done){
 passport.use(new GoogleStrategy({
   clientID: process.env.CLIENT_ID,
   clientSecret: process.env.CLIENT_SECRET,
-  callbackURL: "http://localhost:3000/auth/google/secrets",
+  callbackURL: "http://localhost:3000/auth/google/secret",
   userProfileURL: "https://www.googleapis.com/oauth2/v3/userinfo"
   },
   function(accessToken, refreshToken, profile, done) {
@@ -83,7 +83,7 @@ app.get("/auth/google",
   passport.authenticate('google', { scope: ["profile"] })
 );
 
-app.get("/auth/google/secrets", 
+app.get("/auth/google/secret", 
   passport.authenticate('google', { failureRedirect: "/login" }),
   function(req, res) {
     res.redirect("/secrets");
